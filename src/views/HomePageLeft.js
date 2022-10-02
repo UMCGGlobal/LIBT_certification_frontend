@@ -18,17 +18,21 @@ export default function HomePageLeft(props) {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [items, setItems] = useState({});
-    const { studentName, setStudentName } = useContext(StudentContext)
+    const { studentName, setStudentName } = useContext(StudentContext);
+    const [isResult, setIsResult] = useState(true);
 
     // Note: the empty deps array [] means
     // this useEffect will run once
     // similar to componentDidMount()
     useEffect(() => {
-        fetch(`http://localhost:3000/api/getOneStudent/${props.studentID}`)
+        fetch(`http://ec2-3-91-144-53.compute-1.amazonaws.com:3000/api/getOneStudent/${props.studentID}`)
             .then(res => res.json())
             .then(
                 (result) => {
                     setIsLoaded(true);
+                    if (result == null) {
+                        setIsResult(false);
+                    }
                     setItems(result);
                     setStudentName(result.name);
 
@@ -43,88 +47,93 @@ export default function HomePageLeft(props) {
                 }
 
             )
-    }, [])
+    }, []);
+
+    function createMarkup() {
+        return { __html: items.description };
+    }
 
     const classes = useStyles();
     return (
-        <React.Fragment>
-            <div className={classes.flexHr}>
-                <VerifiedTwoToneIcon color='primary' sx={{ mr: 1 }} />
-                <Link href="https://www.libt.co.uk/" target="_blank">
-                    <Typography variant="h6" gutterBottom color="primary">
-                        London institute of business and technology
-                    </Typography>
-                </Link>
-            </div>
+        isResult === true ?
+            <React.Fragment>
+                <div className={classes.flexHr}>
+                    <VerifiedTwoToneIcon color='primary' sx={{ mr: 1 }} />
+                    <Link href="https://www.libt.co.uk/" target="_blank">
+                        <Typography variant="h6" gutterBottom color="primary">
+                            London institute of business and technology
+                        </Typography>
+                    </Link>
+                </div>
 
 
-            <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-                {items.course}
-            </Typography>
-
-
-
-            <div className={classes.flexHr}>
-                <Button size="small" variant="outlined" startIcon={<ShareOutlinedIcon />} sx={{ mr: 1 }}>
-                    Share
-                </Button>
-                <Button size="small" variant="outlined" startIcon={<PictureAsPdfOutlinedIcon />} sx={{ mr: 1 }}>
-                    Download
-                </Button>
-                <Button size="small" variant="outlined" startIcon={<HelpOutlineOutlinedIcon />}>
-                    Help
-                </Button>
-            </div>
-
-            <div className={classes.flexHr}>
-                <Avatar
-                    alt={items.name}
-                    src="/static/images/avatar/1.jpg"
-                />
-                <Typography variant="subtitle1" gutterBottom sx={{ ml: 2, }}>
-                    {items.name}
+                <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+                    {items.course}
                 </Typography>
 
-            </div>
-            <Divider sx={{ mb: 5 }} />
-            <Typography variant="body2" gutterBottom>
-                {items.description}
-            </Typography>
-            <Divider sx={{ mb: 5, mt: 5 }} />
-            <div className={classes.flexHSB}>
-                <div className={classes.flexV}>
-                    <Typography variant="overline" display="block" gutterBottom>
-                        Issued on
-                    </Typography>
-                    <Typography variant="caption" display="block" gutterBottom>
-                        {items.issuedDate ? items.issuedDate : "Does not exist"}
-                    </Typography>
+
+
+                <div className={classes.flexHr}>
+                    <Button size="small" variant="outlined" startIcon={<ShareOutlinedIcon />} sx={{ mr: 1 }}>
+                        Share
+                    </Button>
+                    <Button size="small" variant="outlined" startIcon={<PictureAsPdfOutlinedIcon />} sx={{ mr: 1 }}>
+                        Download
+                    </Button>
+                    <Button size="small" variant="outlined" startIcon={<HelpOutlineOutlinedIcon />}>
+                        Help
+                    </Button>
                 </div>
-                <div className={classes.flexV}>
-                    <Typography variant="overline" display="block" gutterBottom>
-                        Expired on
+
+                <div className={classes.flexHr}>
+                    <Avatar
+                        alt={items.name}
+                        src="/static/images/avatar/1.jpg"
+                    />
+                    <Typography variant="subtitle1" gutterBottom sx={{ ml: 2, }}>
+                        {items.name}
                     </Typography>
-                    <Typography variant="caption" display="block" gutterBottom>
-                        {items.expireDate ? items.expireDate : "Does not expire"}
-                    </Typography>
+
                 </div>
-            </div>
-            <Divider sx={{ mb: 5, mt: 5 }} />
-            <Typography variant="overline" display="block" gutterBottom>
-                Skills
-            </Typography>
-            <div className={classes.flexHr}>
-                <Button size="small" variant="contained" sx={{ mr: 1 }} disabled>
-                    Share
-                </Button>
-                <Button size="small" variant="contained" sx={{ mr: 1 }} disabled>
-                    Download
-                </Button>
-                <Button size="small" variant="contained" disabled>
-                    Help
-                </Button>
-            </div>
-        </React.Fragment>
+                <Divider sx={{ mb: 5 }} />
+                <Typography variant="body2" gutterBottom dangerouslySetInnerHTML={createMarkup()} />
+
+
+                <Divider sx={{ mb: 5, mt: 5 }} />
+                <div className={classes.flexHSB}>
+                    <div className={classes.flexV}>
+                        <Typography variant="overline" display="block" gutterBottom>
+                            Issued on
+                        </Typography>
+                        <Typography variant="caption" display="block" gutterBottom>
+                            {items.issuedDate ? items.issuedDate : "Does not exist"}
+                        </Typography>
+                    </div>
+                    <div className={classes.flexV}>
+                        <Typography variant="overline" display="block" gutterBottom>
+                            Expired on
+                        </Typography>
+                        <Typography variant="caption" display="block" gutterBottom>
+                            {items.expireDate ? items.expireDate : "Does not expire"}
+                        </Typography>
+                    </div>
+                </div>
+                <Divider sx={{ mb: 5, mt: 5 }} />
+                <Typography variant="overline" display="block" gutterBottom>
+                    Skills
+                </Typography>
+                <div className={classes.flexHr}>
+                    <Button size="small" variant="contained" sx={{ mr: 1 }} disabled>
+                        Share
+                    </Button>
+                    <Button size="small" variant="contained" sx={{ mr: 1 }} disabled>
+                        Download
+                    </Button>
+                    <Button size="small" variant="contained" disabled>
+                        Help
+                    </Button>
+                </div>
+            </React.Fragment> : <div>No data found for this student ID</div>
     );
 }
 
